@@ -326,7 +326,7 @@ while True:
         print('Stone not found', not_found[i], 'consecutive times.')
 
     if not_found[i] >= 3:
-        print('Reseting...')
+        print('Reseting.')
         not_found[i] = 0
         just_joined2[i] = True
 
