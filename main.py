@@ -226,8 +226,10 @@ def search(sample_dir):
     if not out_of_window(loc) and val < 0.07:
         print('Stone found.')
         windowmanager.leftClick(loc)
+        return True
     else:
         print('Stone not found.')
+        return False
 
 client = []
 login = []
@@ -250,17 +252,16 @@ same_hp = []
 prev_hp = []
 just_joined = []
 just_joined2 = []
+not_found = []
 
 for i in client:
     same_hp.append(0)
     prev_hp.append(101)
     just_joined.append(False)
     just_joined2.append(False)
+    not_found.append(0)
 
 i = 0
-
-count = 0
-countx = 40
 
 loop = 0
 
@@ -283,23 +284,19 @@ while True:
     if check_if_kicked():
         just_joined2[i] = True
         reconnect(login[i])
-        count = 0
     elif check_if_dead():
         just_joined2[i] = True
         revive()
-        count = 0
     else:
         windowmanager.press_button('z', 0.1)
-
-        # pyautogui.moveTo(client[i][1], duration=0.2, tween=pyautogui.easeInOutQuad)
-
-        # dis = (0, 0.01)
-        # windowmanager.drag_screen(dis)
 
         image = windowmanager.take_screenshot()
 
         if prev_hp[i] == 101:
-            search(sample_dir)
+            if not search(sample_dir):
+                 not_found[i] += 1
+            else:
+                not_found[i] = 0
 
         hp = get_hp()
 
@@ -314,16 +311,24 @@ while True:
 
         if same_hp[i] >= 1:
             print('Finished.')
-            search(sample_dir)
+            if not search(sample_dir):
+                not_found[i] += 1
+            else:
+                not_found[i] = 0
+
             same_hp[i] = 0
 
         windowmanager.press_button('z', 0.1)
 
-        if count >= countx:
-            count = 0
-            just_joined2[i] = True
-
     loop += 1
+
+    if not_found[i] > 0:
+        print('Stone not found', not_found[i], 'consecutive times.')
+
+    if not_found[i] >= 3:
+        print('Reseting...')
+        not_found[i] = 0
+        just_joined2[i] = True
 
     if i < len(client) - 1:
         i += 1
