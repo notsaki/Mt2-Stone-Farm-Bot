@@ -10,10 +10,10 @@ def get_files(dir):
 
     return files
 
-def get_settings():
+def get_settings(res):
     client = get_config('config\\clients\\', 'screen')
     maps = get_config('config\\maps\\')
-    relatives = get_config('config\\', 'relatives')
+    relatives = get_config('config\\relatives\\', res)
 
     return client, maps, relatives[0]
 

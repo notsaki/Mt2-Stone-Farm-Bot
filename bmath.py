@@ -2,25 +2,6 @@ import cv2 as cv
 import math
 
 def get_relative(top_left, new_top_left, def_pos):
-    top_left = (int(top_left['x']), int(top_left['y']))
-    def_pos = (int(def_pos['x']), int(def_pos['y']))
-
-    dif = (def_pos[0] - top_left[0], def_pos[1] - top_left[1])
-
-    pos = (new_top_left[0] + dif[0], new_top_left[1] + dif[1])
-
-    return pos
-
-def get_relative2(top_left, new_top_left, def_pos):
-    top_left = (int(top_left['x']), int(top_left['y']))
-
-    dif = (def_pos[0] - top_left[0], def_pos[1] - top_left[1])
-
-    pos = (new_top_left[0] + dif[0], new_top_left[1] + dif[1])
-
-    return pos
-
-def get_relative3(top_left, new_top_left, def_pos):
     dif = (def_pos[0] - top_left[0], def_pos[1] - top_left[1])
 
     pos = (new_top_left[0] + dif[0], new_top_left[1] + dif[1])
@@ -46,13 +27,15 @@ def to_int(str):
     return int(num)
 
 def get_tuple(str):
+    tup = ()
     pos = str.split(',')
     for i in range(0, len(pos)):
         pos[i] = pos[i].strip()
 
-    pos = (int(pos[0]), int(pos[1]))
+    for i in pos:
+        tup += (int(i), )
 
-    return pos
+    return tup
 
 def window_to_full(pos, top_left):
     return (pos[0] + top_left[0], pos[1] + top_left[1])
@@ -84,4 +67,16 @@ def find_closest(x, list):
             index = i
 
     return list[i]
-        
+
+def fix_hp(hp):
+    fixed_hp = 0
+    # Fix imperfections of image_to_string to fit the expected values.
+    if hp[:2] == '10':
+        if hp[:3] == '100':
+            fixed_hp = hp[:3]
+        else:
+            fixed_hp = hp[:2]
+    else:
+        fixed_hp = hp[:2]
+
+    return to_int(fixed_hp)
