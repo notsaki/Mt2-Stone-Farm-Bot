@@ -19,7 +19,7 @@ import bmath
 client = None
 
 def init_settings():
-    clnt, maps, relatives, s = bfile.get_settings()
+    clnt, maps, relatives= bfile.get_settings()
     cl = []
     ma = {}
 
@@ -33,8 +33,11 @@ def init_settings():
             navigation = {
                 'task_bar': bmath.get_tuple(i['navigation']['task-bar']), 
                 'top_left': bmath.get_tuple(i['navigation']['top-left']), 
-                'window_size': bmath.get_tuple(i['navigation']['window-size'])
+                'window_size': bmath.get_tuple(i['navigation']['window-size']), 
+                'menu': bmath.get_tuple(i['navigation']['menu']), 
+                'area': bmath.get_tuple(i['navigation']['area'])
             }
+
             skills = []
             for k, j in i['skills'].items():
                 skills.append(j)
@@ -65,9 +68,9 @@ def init_settings():
 
         ma.update({name: classes.Map(dir, navigation, object_detection)})
 
-    return cl, ma, relatives, s
+    return cl, ma, relatives
 
-c, m, relatives, settings = init_settings()
+c, m, relatives = init_settings()
 
 def in_character_selection():
     # Check if in character selection.
@@ -75,11 +78,11 @@ def in_character_selection():
                 name='select_player', 
                 method=cv.TM_SQDIFF_NORMED, 
                 hl=0, 
-                threshold=0.2,
+                threshold=0.3,
                 top_left=client.navigation['top_left'],
                 size=client.navigation['window_size'])
 
-    if loc == None:
+    if not loc:
         return False
 
     return True
@@ -157,14 +160,14 @@ def login():
 def is_farming():
     prev_hp = 101
     count = 0
-    loops = 10
+    loops = 3
     # hp100 = 0
     # hp0 = 0
     for i in range(0, loops):
         loc = bimage.search_object(dir='icons\\hp',
             method=cv.TM_SQDIFF_NORMED, 
             hl=0, 
-            threshold=0.4,
+            threshold=0.2,
             top_left=client.navigation['top_left'],
             size=client.navigation['window_size'])
         
@@ -187,7 +190,7 @@ def is_farming():
     # if hp100 >= loops:
     #     return False
     # print(count)
-    if count > 8:
+    if count > 2:
         return False
     
     return True
@@ -217,9 +220,9 @@ def get_status():
     # if kicked():
     #     return 'kicked'
     
-    # Character selection.
-    if in_character_selection():
-        return 'character_selection'
+    # # Character selection.
+    # if in_character_selection():
+    #     return 'character_selection'
 
     # Check if player is farming.
     if is_farming():
@@ -331,11 +334,15 @@ def go_to_map():
     # if not loc:
     #     return False
     binput.press_button('3')
-    
-    pos = bmath.get_relative(relatives['top-left'], client.navigation['top_left'], relatives['menu'])
+    top_left = client.navigation['top_left']
+    menu = client.navigation['menu']
+
+    pos = bmath.get_relative2(relatives['top-left'], top_left, menu)
     binput.left_click(pos)
 
-    pos = bmath.get_relative(relatives['top-left'], client.navigation['top_left'], relatives['area'])
+    area = client.navigation['area']
+
+    pos = bmath.get_relative2(relatives['top-left'], top_left, area)
     binput.left_click(pos)
 
     # loc = bmath.window_to_full(loc, client.navigation['top_left'])
@@ -358,6 +365,8 @@ def go_to_map():
     loading_screen()
 
     print('Teleported.')
+    pos = bmath.get_relative(relatives['top-left'], client.navigation['top_left'], relatives['mini-map'])
+    binput.left_click(pos)
 
     return True
 
@@ -408,17 +417,44 @@ def reset_skills():
 def calibrate_screen():
     print('Calibrating...')
 
-    binput.press_button(button='r', time=2)
-    binput.press_button(button='f', time=0.8)
-    binput.press_button(button='g', time=4)
+    # binput.press_button(button='r', time=2)
+    binput.press_button(button='f', time=1.2)
+    binput.press_button(button='g', time=3)
     binput.press_button(button='t', time=0.7)
 
     print('Calibration done.')
+
+def start_farming():
+    sleep(0.1)
+    binput.press_button('z', 0.5)
+    # Double check.
+    # cl.status = get_status()
+    # print('Status:', get_status())
+    # if cl.status == 'not_farming':
+    #     pos = bmath.find_centre(cl.navigation['top_left'], cl.navigation['window_size'])
+    loc = start_search()
+    if loc:
+        print('Found stone at', loc)
+        loc = (loc[0], loc[1] + 80)
+        binput.left_click(loc)
+        binput.press_button('e', 1.5)
+    else:
+        print('Can\'t find stone.')
+        if go_to_map():
+            calibrate_screen()
+            # reset_skills()
+            loc = start_search()
+            if loc:
+                print('Found stone at', loc)
+                loc = (loc[0], loc[1] + 95)
+                binput.left_click(loc)
+                binput.press_button('e', 1.5)
 
 loop = 1
 reset = True
 
 last_id = 0
+# false_pos = 0
 
 while True:
     for cl in c:
@@ -426,72 +462,69 @@ while True:
         print('\nLoop:', loop)
         print('Player:', cl.name)
 
-        # binput.press_button('z')
+        binput.press_button('z')
 
         if not cl.id == last_id:
             binput.left_click(cl.navigation['task_bar'])
-
-        if not cl.status == 'lost' and not cl.status == 'stuck':
+        # and not cl.status == 'stuck'
+        if not cl.status == 'lost':
             cl.status = get_status()
 
         print('Status:', cl.status)
+        # print('False Positives:', false_pos)
 
-        if cl.status == 'stuck':
-            # binput.press_button('esc')
-            cl.status = 'not_farming'
+        # if cl.status == 'stuck':
+        #     # binput.press_button('esc')
+        #     cl.status = 'not_farming'
 
         if cl.status == 'kicked':
             login()
+            character_selection()
         elif cl.status == 'character_selection':
             character_selection()
             print('Connected.')
         elif cl.status == 'lost':
+            binput.press_button('z')
             if go_to_map():
                 calibrate_screen()
                 reset_skills()
 
             cl.status = 'not_farming'
         elif cl.status == 'not_farming':
-            sleep(0.1)
-            binput.press_button('z', 0.5)
-            # Double check.
-            cl.status = get_status()
-            print('Status:', get_status())
-            if cl.status == 'not_farming':
-                pos = bmath.find_centre(cl.navigation['top_left'], cl.navigation['window_size'])
-                if inventory_is_open():
-                    binput.press_button(button='i')
-
-                loc = start_search()
-                if loc:
-                    print('Found stone at', loc)
-                    loc = (loc[0], loc[1] + 120)
-                    binput.left_click(loc)
-                    binput.press_button('e', 1.5)
-                else:
-                    print('Can\'t find stone.')
-                    cl.status = 'lost'
-                    pos = bmath.find_centre(cl.navigation['top_left'], cl.navigation['window_size'])
-                    binput.left_click(pos)
+            cl.hp_history = []
+            binput.press_button('z')
+            start_farming()
         elif cl.status == 'farming':
             hp = get_hp()
-            if hp == 100:
+            stuck = False
+            if len(cl.hp_history) > 0:
+                stuck = hp > cl.hp_history[-1]
+
+            if hp == 100 or stuck:
                 while len(cl.hp_history) <= 5:
                     cl.hp_history.append(get_hp())
-
+                
             if len(cl.hp_history) < 5:
                 cl.hp_history.append(hp)
                 print('HP History:', cl.hp_history)
             elif len(cl.hp_history) >= 5:
+                print('HP History:', cl.hp_history)
                 same_hp = 0
                 for i in range(1, len(cl.hp_history)):
                     if cl.hp_history[i] >= cl.hp_history[i - 1]:
                         same_hp += 1
 
                 if same_hp > 3:
+                    cl.hp_history = []
                     print('Stuck.')
-                    binput.press_button('space', 5)
-                    cl.status = 'stuck'
+                    binput.press_button('z')
+                    binput.press_button('1', 0.1)
+                    binput.press_button('w', 3)
+                    sleep(1)
+                    pos = bmath.find_centre(cl.navigation['top_left'], cl.navigation['window_size'])
+                    pos = (pos[0], pos[1] + 70)              
+                    binput.left_click(pos)
+                    start_farming()
 
                 cl.hp_history = []
             print('Stone HP:', hp)
@@ -499,8 +532,12 @@ while True:
             revive()
             if go_to_map():
                 calibrate_screen()
+                reset_skills()
+                start_farming()
         else:
             print('Something\'s wrong.')
+
+        binput.press_button('z')
 
         last_id = cl.id
 
