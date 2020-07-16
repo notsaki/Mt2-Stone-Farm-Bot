@@ -33,32 +33,6 @@ def close_hud():
                 break
     print('Done.')
 
-def loading_screen():
-    sleep(2)
-    # Loading screen.
-    print('Loading screen...')
-    count = 0
-    # Wait until the inventory image appears. This will mean player is connected.   
-    for i in range(0, 100):
-        loc = bimage.search_object(dir='icons\\', 
-                name='inventory_button', 
-                method=cv.TM_CCORR_NORMED, 
-                hl=1, 
-                threshold=0.4,
-                top_left=settings.client.navigation['top_left'],
-                size=settings.client.navigation['window_size'])
-                
-        if loc:
-            count += 1
-            if count >= 10:
-                break
-        
-
-    if count >= 10:
-        return True
-
-    return False
-
 def character_selection():
     # Select player.
     print('Character selection.')
@@ -72,7 +46,7 @@ def character_selection():
 
     binput.press_button(button='enter')
 
-    return loading_screen()
+    return status.loading_screen()
 
 def login():
     i = 0
@@ -98,7 +72,8 @@ def login():
     if i == max:
         binput.press_button('enter')
         return False
-    
+
+    character_selection()
     return True
 
 def revive():
@@ -136,7 +111,7 @@ def go_to_map():
             pos = bmath.get_relative(top_left, settings.client.navigation['top_left'], n)
             binput.left_click(pos, 0.2)
 
-        if loading_screen():
+        if status.loading_screen():
             print('Teleported.')
             return True
 
@@ -172,6 +147,7 @@ def select_target(loc):
 
 def reset():
     if go_to_map():
+        close_hud()
         calibrate_screen()
         reset_skills()
 
@@ -182,6 +158,7 @@ def reset():
 
 def setup():
     print('Connected.')
+    close_hud()
     calibrate_screen()
     reset_skills()
     binput.press_button('z')

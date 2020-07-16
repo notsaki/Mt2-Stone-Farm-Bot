@@ -5,6 +5,33 @@ import bimage
 import bmath
 import settings
 
+def loading_screen():
+    sleep(10)
+    # Loading screen.
+    # print('Loading screen...')
+    # count = 0
+    # # Wait until the inventory image appears. This will mean player is connected.   
+    # for i in range(0, 100):
+    #     loc = bimage.search_object(dir='icons\\', 
+    #             name='inventory_button', 
+    #             method=cv.TM_CCORR_NORMED, 
+    #             hl=1, 
+    #             threshold=0.4,
+    #             top_left=settings.client.navigation['top_left'],
+    #             size=settings.client.navigation['window_size'])
+                
+    #     if loc:
+    #         count += 1
+    #         if count >= 10:
+    #             break
+        
+
+    # if count >= 10:
+    #     return True
+
+    # return False
+    return True
+
 def hud(name, threshold=20):
     loc = bimage.search_object(dir='icons\\hud\\', 
                     name=name, 

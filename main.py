@@ -21,8 +21,8 @@ def get_status():
         return 'Kicked'
     
     # Character selection.
-    if status.in_character_selection():
-        return 'Character Selection'
+    # if status.in_character_selection():
+    #     return 'Character Selection'
 
     # Check if player is Farming.
     if status.is_farming():
@@ -88,6 +88,7 @@ while True:
             settings.client.hp_history = []
 
         elif settings.client.status == 'Not Farming':
+            actions.close_hud()
             settings.client.hp_history = []
             binput.press_button('z')
             if actions.start_farming():    
