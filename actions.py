@@ -116,7 +116,7 @@ def go_to_map(client, maps, relative_values):
         for n in map.navigation:
             top_left = settings.get_value_by_name(relative_values, 'top-left').value
             pos = bmath.get_relative(top_left, client.navigation['top_left'], n)
-            binput.left_click(pos)
+            binput.left_click(pos, 0.2)
 
         if loading_screen(client):
             sleep(3)
@@ -156,7 +156,7 @@ def select_target(loc):
     print('Found stone at', loc)
     loc = (loc[0], loc[1] + 80)
     binput.left_click(loc)
-    binput.press_button('e', 1)
+    # binput.press_button('e', 1)
 
 def reset(client, maps, relative_values):
     if go_to_map(client, maps, relative_values):

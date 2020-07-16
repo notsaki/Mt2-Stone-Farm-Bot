@@ -61,7 +61,11 @@ while True:
 
         print('Status:', client.status)
 
-        if client.status == 'Kicked':
+        if client.count_stuck >= 5:
+            client.count_stuck = 0
+            actions.reset(client, maps, relative_values)
+
+        elif client.status == 'Kicked':
             actions.login(client, relative_values)
             if actions.character_selection(client):
                 actions.setup(client, maps, relative_values)

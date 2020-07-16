@@ -10,11 +10,11 @@ def take_screenshot():
     
     return image
 
-def left_click(loc=(0, 0), dur=0.5):
+def left_click(loc=(0, 0), dur=0.1):
     pyautogui.moveTo(loc, duration=dur, tween=pyautogui.easeInOutQuad)
     pyautogui.click(loc)
 
-def right_click(loc=(0, 0), dur=0.3):
+def right_click(loc=(0, 0), dur=0.1):
     pyautogui.moveTo(loc, duration=dur, tween=pyautogui.easeInOutQuad)
     pyautogui.click(button='right')
 
