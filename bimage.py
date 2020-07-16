@@ -17,6 +17,8 @@ def draw_box(image, needles, size):
 
 def show_image(image):
     cv.imshow('Result', image)
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
     cv.waitKey()
 
 def get_text(point=(0, 0), size=(0, 0), pars=None):
@@ -54,7 +56,7 @@ def show_best_match(image, top_left, needle):
 def search_object(dir='', name='', method=cv.TM_SQDIFF_NORMED, hl=0, threshold=0, top_left=None, size=None):
     image = binput.take_screenshot()
     image = crop_image(image, top_left, size)
-
+    # show_image(image)
     samples = bfile.get_images(dir, name)
     
     val = None
@@ -63,6 +65,8 @@ def search_object(dir='', name='', method=cv.TM_SQDIFF_NORMED, hl=0, threshold=0
     for s in samples:
         # Match for each sample.
         result = cv.matchTemplate(image, s, method)
+
+        # show_image(result)
 
         # Get the most and the least accurate points on the image. Whitest of blackest.
         t_min_val, t_max_val, t_min_loc, t_max_loc = cv.minMaxLoc(result)
@@ -101,6 +105,14 @@ def search_object(dir='', name='', method=cv.TM_SQDIFF_NORMED, hl=0, threshold=0
                 return None
 
     return loc
+# while True:
+#     loc = search_object(dir='icons\\', 
+#                     name='inventory_button', 
+#                     method=cv.TM_CCORR_NORMED, 
+#                     hl=0, 
+#                     threshold=20,
+#                     top_left=(895, 270),
+#                     size=(1024, 600))
 
 def search_all(dir='', name='', method=cv.TM_SQDIFF_NORMED, hl=0, threshold=0, top_left=None, size=None):
     image = binput.take_screenshot()

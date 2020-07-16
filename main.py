@@ -11,34 +11,28 @@ import settings
 import actions
 import status
 
-client = None
-
 def get_status():
-    global client
-
     # Dead.
-    if status.dead(client):
+    if status.dead():
         return 'Dead'
 
     # Kicked.
-    if status.kicked(client):
+    if status.kicked():
         return 'Kicked'
     
     # Character selection.
-    if status.in_character_selection(client):
+    if status.in_character_selection():
         return 'Character Selection'
 
     # Check if player is Farming.
-    if status.is_farming(client):
-        client, stuck = status.is_stuck(client, relative_values)
-        if stuck:
-            client.count_stuck += 1
+    if status.is_farming():
+        if status.is_stuck():
             return 'Stuck'
         return 'Farming'
     
     return 'Not Farming'
 
-clients, maps, relative_values = settings.init_settings()
+settings.init()
 
 loop = 1
 
@@ -46,81 +40,85 @@ last_id = 0
 
 while True:
     i = 0
-    while i < len(clients):
-        client = clients[i]
+    while i < len(settings.clients):
+        settings.client = settings.clients[i]
         print('\nLoop:', loop)
-        print('Player:', client.name)
+        print('Player:', settings.client.name)
 
         binput.press_button('z')
 
-        if not client.id == last_id:
-            binput.left_click(client.navigation['task_bar'])
+        if not settings.client.id == last_id:
+            binput.left_click(settings.client.navigation['task_bar'])
 
-        if not client.status == 'Lost':
-            client.status = get_status()
+        if not settings.client.status == 'Lost':
+            settings.client.status = get_status()
 
-        print('Status:', client.status)
+        print('Status:', settings.client.status)
 
-        if client.count_stuck >= 5:
-            client.count_stuck = 0
-            actions.reset(client, maps, relative_values)
+        if settings.client.count_stuck >= 5:
+            settings.client.count_stuck = 0
+            actions.reset()
 
-        elif client.status == 'Kicked':
-            actions.login(client, relative_values)
-            if actions.character_selection(client):
-                actions.setup(client, maps, relative_values)
-                client.hp_history = []
+        elif settings.client.status == 'Kicked':
+            actions.login()
+            if actions.character_selection():
+                actions.setup()
+                settings.client.hp_history = []
+                actions.close_hud()
             else:
                 print('Abort.')
 
-        elif client.status == 'Character Selection':
-            if actions.character_selection(client):
-                actions.setup(client, maps, relative_values)
-                client.hp_history = []
+        elif settings.client.status == 'Character Selection':
+            if actions.character_selection():
+                actions.setup()
+                settings.client.hp_history = []
             else:
                 print('Abort.')
 
-        elif client.status == 'Stuck':
-            actions.unstuck(client, maps, relative_values)
-            client.hp_history = []
-            client.status = 'Not Farming'
-        elif client.status == 'Lost':
-            binput.press_button('z')
-            actions.reset(client, maps, relative_values)
-            client.status = 'Not Farming'
-            client.hp_history = []
+        elif settings.client.status == 'Stuck':
+            actions.unstuck()
+            settings.client.hp_history = []
+            settings.client.status = 'Not Farming'
 
-        elif client.status == 'Not Farming':
-            client.hp_history = []
+        elif settings.client.status == 'Lost':
             binput.press_button('z')
-            if actions.start_farming(client, maps, relative_values):    
-                client.status = 'Farming'
+            actions.reset()
+            actions.close_hud()
+            settings.client.status = 'Not Farming'
+            settings.client.hp_history = []
+
+        elif settings.client.status == 'Not Farming':
+            settings.client.hp_history = []
+            binput.press_button('z')
+            if actions.start_farming():    
+                settings.client.status = 'Farming'
             else:
-                client.status = 'Lost'
+                settings.client.status = 'Lost'
 
-        elif client.status == 'Farming':
-            hp = status.get_hp(client, relative_values)
+        elif settings.client.status == 'Farming':
+            hp = status.get_hp()
             print('Stone HP:', hp)
-            client.count_stuck = client.count_stuck
-            if client.count_stuck >= 5:
-                client.hp_history = []
+            settings.client.count_stuck = settings.client.count_stuck
+            if settings.client.count_stuck >= 5:
+                settings.client.hp_history = []
                 binput.press_button('z')
-                actions.reset(client, maps, relative_values)
+                actions.reset()
 
-        elif client.status == 'Dead':
-            actions.revive(client, maps, relative_values)
-            client.status = 'Not Farming'
+        elif settings.client.status == 'Dead':
+            actions.revive()
+            settings.client.status = 'Not Farming'
 
         else:
             print('Something\'s wrong.')
 
         binput.press_button('z')
 
-        last_id = client.id
+        last_id = settings.client.id
 
         loop += 1
-        if len(client.hp_history) >= 5:
-            client.hp_history = []
-        clients[i] = client
-        if client.status == 'Farming':
+        if len(settings.client.hp_history) >= 5:
+            settings.client.hp_history = []
+
+        settings.clients[i] = settings.client
+        if settings.client.status == 'Farming':
             i += 1

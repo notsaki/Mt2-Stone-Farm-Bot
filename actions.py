@@ -7,28 +7,46 @@ import bmath
 import bimage
 import status
 
-def loading_screen(client):
-    sleep(1)
+def close_hud():
+    print('Checking hud...')
+    if status.hud('inventory'):
+        binput.press_button('i')
+
+    if status.hud('minimap', 1000000):
+        top_left = settings.get_value_by_name(settings.relative_values, 'top-left').value
+        mini_map = settings.get_value_by_name(settings.relative_values, 'mini-map').value
+        pos = bmath.get_relative(top_left, settings.client.navigation['top_left'], mini_map)
+        binput.left_click(pos)
+    
+    hud_list = ['character', 'friends_list', 'itemshop', 'map', 'menu', 'shop']
+    stop = False
+    
+    while not stop:
+        for h in hud_list:
+            if status.hud(h):
+                binput.press_button('Esc')
+
+        stop = True
+        for h in hud_list:
+            if status.hud(h):
+                stop = False
+                break
+    print('Done.')
+
+def loading_screen():
+    sleep(2)
     # Loading screen.
     print('Loading screen...')
     count = 0
-    # Wait until the inventory image appears. This will mean player is connected.
-    loc = bimage.search_object(dir='icons', 
-                name='inventory', 
-                method=cv.TM_SQDIFF_NORMED, 
-                hl=0, 
-                threshold=0.2,
-                top_left=client.navigation['top_left'],
-                size=client.navigation['window_size'])
-    
-    for i in range(0, 500):
-        loc = bimage.search_object(dir='icons', 
-                name='inventory', 
-                method=cv.TM_SQDIFF_NORMED, 
-                hl=0, 
-                threshold=0.38,
-                top_left=client.navigation['top_left'],
-                size=client.navigation['window_size'])
+    # Wait until the inventory image appears. This will mean player is connected.   
+    for i in range(0, 100):
+        loc = bimage.search_object(dir='icons\\', 
+                name='inventory_button', 
+                method=cv.TM_CCORR_NORMED, 
+                hl=1, 
+                threshold=0.4,
+                top_left=settings.client.navigation['top_left'],
+                size=settings.client.navigation['window_size'])
                 
         if loc:
             count += 1
@@ -36,41 +54,41 @@ def loading_screen(client):
                 break
         
 
-    if count >= 3:
+    if count >= 10:
         return True
 
     return False
 
-def character_selection(client):
+def character_selection():
     # Select player.
     print('Character selection.')
-    if client.pos == 'left':
+    if settings.client.pos == 'left':
         binput.press_button(button='left')
-    elif client.pos == 'right':
+    elif settings.client.pos == 'right':
         binput.press_button(button='right')
-    elif client.pos == 'back':
+    elif settings.client.pos == 'back':
         binput.press_button(button='right')
         binput.press_button(button='right')
 
     binput.press_button(button='enter')
 
-    return loading_screen(client)
+    return loading_screen()
 
-def login(client, relative_values):
+def login():
     i = 0
     max = 20
-    point = settings.get_value_by_name(relative_values, 'channel' + str(client.channel)).value
-    top_left = settings.get_value_by_name(relative_values, 'top-left').value
+    point = settings.get_value_by_name(settings.relative_values, 'channel' + str(settings.client.channel)).value
+    top_left = settings.get_value_by_name(settings.relative_values, 'top-left').value
 
-    pos = bmath.get_relative(top_left, client.navigation['top_left'], point)
+    pos = bmath.get_relative(top_left, settings.client.navigation['top_left'], point)
 
     binput.left_click(pos)
 
-    while i < max and status.kicked(client):
-        point = settings.get_value_by_name(relative_values, 'account' + str(client.id)).value
-        top_left = settings.get_value_by_name(relative_values, 'top-left').value
+    while i < max and status.kicked():
+        point = settings.get_value_by_name(settings.relative_values, 'account' + str(settings.client.id)).value
+        top_left = settings.get_value_by_name(settings.relative_values, 'top-left').value
 
-        pos = bmath.get_relative(top_left, client.navigation['top_left'], point)
+        pos = bmath.get_relative(top_left, settings.client.navigation['top_left'], point)
         
         binput.left_click(pos)
 
@@ -83,59 +101,53 @@ def login(client, relative_values):
     
     return True
 
-def revive(client, maps, relative_values):
-    top_left = settings.get_value_by_name(relative_values, 'top-left').value
-    revive = settings.get_value_by_name(relative_values, 'revive-here').value
-    top_left = bmath.get_relative(top_left, client.navigation['top_left'], revive)
-    size = settings.get_value_by_name(relative_values, 'revive-rectangle').value
+def revive():
+    top_left = settings.get_value_by_name(settings.relative_values, 'top-left').value
+    revive = settings.get_value_by_name(settings.relative_values, 'revive-here').value
+    top_left = bmath.get_relative(top_left, settings.client.navigation['top_left'], revive)
+    size = settings.get_value_by_name(settings.relative_values, 'revive-rectangle').value
 
     pos = bmath.find_centre(top_left, size)
-    while status.dead(client) and not status.kicked(client):
+    while status.dead() and not status.kicked():
         binput.left_click(pos)
 
-    unstuck(client, maps, relative_values)
+    unstuck()
 
-def unstuck(client, maps, relative_values):
-    x = settings.get_value_by_name(relative_values, 'stone-bar-close').value
-    top_left = settings.get_value_by_name(relative_values, 'top-left').value
-    pos = bmath.get_relative(top_left, client.navigation['top_left'], x)
+def unstuck():
+    x = settings.get_value_by_name(settings.relative_values, 'stone-bar-close').value
+    top_left = settings.get_value_by_name(settings.relative_values, 'top-left').value
+    pos = bmath.get_relative(top_left, settings.client.navigation['top_left'], x)
     binput.left_click(pos)
 
     binput.press_button('z')
-    binput.press_button(client.horse_slash, 0.1)
+    binput.press_button(settings.client.horse_slash, 0.1)
     binput.press_button('w', 3)
     sleep(1)
-    pos = bmath.find_centre(client.navigation['top_left'], client.navigation['window_size'])
+    pos = bmath.find_centre(settings.client.navigation['top_left'], settings.client.navigation['window_size'])
     pos = (pos[0], pos[1] + 70)              
     binput.left_click(pos)
 
-def go_to_map(client, maps, relative_values):
-    map = settings.get_value_by_name(maps, client.map)
+def go_to_map():
+    map = settings.get_value_by_name(settings.maps, settings.client.map)
     if map:
-        binput.press_button(client.ring)
+        binput.press_button(settings.client.ring)
         for n in map.navigation:
-            top_left = settings.get_value_by_name(relative_values, 'top-left').value
-            pos = bmath.get_relative(top_left, client.navigation['top_left'], n)
+            top_left = settings.get_value_by_name(settings.relative_values, 'top-left').value
+            pos = bmath.get_relative(top_left, settings.client.navigation['top_left'], n)
             binput.left_click(pos, 0.2)
 
-        if loading_screen(client):
-            sleep(3)
+        if loading_screen():
             print('Teleported.')
-            top_left = settings.get_value_by_name(relative_values, 'top-left').value
-            mini_map = settings.get_value_by_name(relative_values, 'mini-map').value
-            pos = bmath.get_relative(top_left, client.navigation['top_left'], mini_map)
-            binput.left_click(pos)
-
             return True
 
     return False
 
-def reset_skills(client):
-    if client.skills:
+def reset_skills():
+    if settings.client.skills:
         print('Reseting skills...')
         binput.double_press('Ctrl', 'g')
 
-        for i in client.skills:
+        for i in settings.client.skills:
             binput.press_button(button=i, time=2)
 
         binput.double_press('Ctrl', 'g')
@@ -158,31 +170,27 @@ def select_target(loc):
     binput.left_click(loc)
     # binput.press_button('e', 1)
 
-def reset(client, maps, relative_values):
-    if go_to_map(client, maps, relative_values):
+def reset():
+    if go_to_map():
         calibrate_screen()
-        reset_skills(client)
+        reset_skills()
 
         return True
     
     print('Abort.')
     return False
 
-def setup(client, maps, relative_values):
-    sleep(3)
+def setup():
     print('Connected.')
     calibrate_screen()
-    reset_skills(client)
+    reset_skills()
     binput.press_button('z')
-    start_farming(client, maps, relative_values)
+    start_farming()
 
-def start_farming(client, maps, relative_values):
-    if status.inventory_is_open(client):
-        binput.press_button('i')
-
+def start_farming():
     sleep(0.1)
     binput.press_button('z', 0.5)
-    loc = start_search(client, maps)
+    loc = start_search()
     if loc:
         select_target(loc)
 
@@ -192,29 +200,29 @@ def start_farming(client, maps, relative_values):
     return False
 
 
-def search(client, maps):
+def search():
     print('Searching for stone...')
-    map = settings.get_value_by_name(maps, client.map)
+    map = settings.get_value_by_name(settings.maps, settings.client.map)
     loc = bimage.search_all(dir=map.dir, 
                 method=cv.TM_SQDIFF_NORMED,
                 hl=map.object_detection['hl'],
                 threshold=map.object_detection['threshold'],
-                top_left=client.navigation['top_left'],
-                size=client.navigation['window_size'])
+                top_left=settings.client.navigation['top_left'],
+                size=settings.client.navigation['window_size'])
 
-    # loc = bimage.search_object(dir=maps[client.map].dir, 
+    # loc = bimage.search_object(dir=settings.maps[settings.client.map].dir, 
     #             method=cv.TM_SQDIFF_NORMED,
-    #             hl=maps[client.map].object_detection['hl'],
-    #             threshold=maps[client.map].object_detection['threshold'],
-    #             top_left=client.navigation['top_left'],
-    #             size=client.navigation['window_size'])
+    #             hl=settings.maps[settings.client.map].object_detection['hl'],
+    #             threshold=settings.maps[settings.client.map].object_detection['threshold'],
+    #             top_left=settings.client.navigation['top_left'],
+    #             size=settings.client.navigation['window_size'])
     
     if loc:
         top_left = (0, 0)
         for i in range(0, len(loc)):
-            loc[i] = bmath.get_relative(top_left, client.navigation['top_left'], loc[i])
+            loc[i] = bmath.get_relative(top_left, settings.client.navigation['top_left'], loc[i])
 
-        centre = bmath.find_centre(client.navigation['top_left'], client.navigation['window_size'])
+        centre = bmath.find_centre(settings.client.navigation['top_left'], settings.client.navigation['window_size'])
         point = bmath.find_closest(centre, loc)
         # print(point)
         
@@ -222,8 +230,8 @@ def search(client, maps):
 
     return None
 
-def start_search(client, maps):
-    loc = search(client, maps)
+def start_search():
+    loc = search()
 
     if loc:
         return loc
@@ -231,7 +239,7 @@ def start_search(client, maps):
     for i in range(0, 7):
         binput.press_button(button='e', time=0.5)
 
-        loc = search(client, maps)
+        loc = search()
 
         if loc:
             return loc
