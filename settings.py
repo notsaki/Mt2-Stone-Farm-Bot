@@ -2,8 +2,6 @@ import bmath
 import bfile
 import classes
 
-from pprint import pprint
-
 def init():
     global clients, maps, relative_values, client
 

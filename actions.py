@@ -18,7 +18,7 @@ def close_hud():
         pos = bmath.get_relative(top_left, settings.client.navigation['top_left'], mini_map)
         binput.left_click(pos)
     
-    hud_list = ['character', 'friends_list', 'itemshop', 'map', 'menu', 'shop']
+    hud_list = ['character', 'friends_list', 'itemshop', 'map', 'menu', 'shop', 'shop2']
     stop = False
     
     while not stop:
@@ -73,7 +73,6 @@ def login():
         binput.press_button('enter')
         return False
 
-    character_selection()
     return True
 
 def revive():
@@ -143,7 +142,7 @@ def select_target(loc):
     print('Found stone at', loc)
     loc = (loc[0], loc[1] + 80)
     binput.left_click(loc)
-    # binput.press_button('e', 1)
+    binput.press_button('e', 0.5)
 
 def reset():
     if go_to_map():

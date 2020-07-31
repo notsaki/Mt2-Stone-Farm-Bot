@@ -38,7 +38,9 @@ loop = 1
 
 last_id = 0
 
-while True:
+max_loops = 5000
+
+while loop < max_loops:
     i = 0
     while i < len(settings.clients):
         settings.client = settings.clients[i]
@@ -62,6 +64,7 @@ while True:
         elif settings.client.status == 'Kicked':
             actions.login()
             if actions.character_selection():
+                actions.go_to_map()
                 actions.setup()
                 settings.client.hp_history = []
                 actions.close_hud()
@@ -88,7 +91,6 @@ while True:
             settings.client.hp_history = []
 
         elif settings.client.status == 'Not Farming':
-            actions.close_hud()
             settings.client.hp_history = []
             binput.press_button('z')
             if actions.start_farming():    
@@ -107,6 +109,7 @@ while True:
 
         elif settings.client.status == 'Dead':
             actions.revive()
+            actions.reset_skills()
             settings.client.status = 'Not Farming'
 
         else:

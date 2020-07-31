@@ -2,7 +2,7 @@ import binput
 import keyboard
 from time import sleep
 
-task_bar = (316, 1066)
+task_bar = (1291, 1062)
 loop = 1
 binput.left_click(task_bar)
 keyboard.press('space')
