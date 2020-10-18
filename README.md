@@ -1,5 +1,5 @@
 # Metin2 Stone-Farm Bot
-A bot written in Python and using image processing to auto-farm Metin stones. The bot may not be suitable for slow computers as it needs CPU power to process images and detect objects in it. Otherwise it will be painfully slow or may not even work properly.
+A bot written in Python using image processing to auto-farm Metin stones. The bot may not be suitable for slow computers as it needs CPU power to process images and detect objects in it. Otherwise it will be painfully slow or may not even work properly.
 
 ## How it works
 - Logins to your character.
