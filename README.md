@@ -15,6 +15,7 @@ A bot written in Python using image processing to auto-farm Metin stones. The bo
 - Your character should have a horse and ride it for the bot to work properly.
 - The bot can handle multiple clients at the same time.
 - The bot uses libraries that only work on Windows.
+- The bot is still not finished. However, it may or may not be continued. There are many configurations that are hardcoded and the modularity is poor.
 
 ## Configuration
 First of all, I need to explain the config files. In order to configure the bot properly, you need to understand how exactly it works.
@@ -120,6 +121,8 @@ This is the config files for the clients you want to use. Each file is used for 
 
 ### Start the bot
 Before you run, make sure you you have opened the clients you want to use in their login screens. Run the bot by typing `python main.py`. After that, don't touch your keyboard and don't click anywhere. Do it only if you want to stop the bot. To do so, quickly open the cmd window and press `Ctrl` + `C`.
+
+The bot will run for 5000 times in total. That means each time it catches a player farming, it counts +1. In `main.py` change the `max_loops` value if you want to change the value or replace the `while loop < max_loops:` line with `while True:` to run the program infinitely.
 
 There are also two extra scripts:
 - `cords.py` which you can use to click anywhere on your screen and get the coordinates. It uses only the `pyautogui` library.
