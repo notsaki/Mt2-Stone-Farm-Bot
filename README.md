@@ -106,7 +106,7 @@ This is the config files for the clients you want to use. Each file is used for 
 ## Run
 
 ### Requirements
-- You need to install Python 3.7 or newer. Also, add it to the Windows path.
+- You need to install Python 3.7 or newer.
 - Open cmd and using `pip`, install the following libraries:
  
     - pillow
