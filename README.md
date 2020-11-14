@@ -64,7 +64,7 @@ First of all, you need to take a couple of screenshots. One of your login screen
 
 - `top-left` is of course your screen's top left position. Not the window but the very top left pixel of your game screen. It is recommended to get it right so it doesn't cause miscalculations.
 - `window-size` is your client's window size. Basically the game resolution however, the height should be the without including the bottom bar. Give it some extra 50-100 pixels offset as well because you won't need that part of your screen the image process. See the already existing values to get an idea.
-- stone-bar-close is the x button on the health bar. This is basically the main issue with the 800x600 resolution as it may overlap with the event buttons next to it.
+- `stone-bar-close` is the x button on the health bar. This is basically the main issue with the 800x600 resolution as it may overlap with the event buttons next to it.
 - `mini-map` is the button that closes the minimap at the top right of your screen.
 
 For the stone hp the bot creates a rectangle around the hp value and detects the text inside it. So in order to take the value we need a top left position and the rectangle size:
