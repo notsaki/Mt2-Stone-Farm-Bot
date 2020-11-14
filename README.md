@@ -103,7 +103,9 @@ This is the config files for the clients you want to use. Each file is used for 
 - `skills` is the same as ring but for skills. Add the skills like Aura of Sword or buffs or whatever that you need to have your character prepared. Add as many as you want. Also, the name doesn't matter. It's just an identifier.
 - `horse-skills` is, of course, for horse skills. Currently only slash is supported that is used to unstuck your character if they're being surrounded.
 
-## Requirements
+## Run
+
+### Requirements
 - You need to install Python 3.7 or newer. Also, add it to the Windows path.
 - Open cmd and using `pip`, install the following libraries:
  
@@ -116,7 +118,7 @@ This is the config files for the clients you want to use. Each file is used for 
     - imutils
     - pytesseract
 
-### Run
+### Start the bot
 Before you run, make sure you you have opened the clients you want to use in their login screens. Run the bot by typing `python main.py`. After that, don't touch your keyboard and don't click anywhere. Do it only if you want to stop the bot. To do so, quickly open the cmd window and press `Ctrl` + `C`.
 
 There are also two extra scripts:
