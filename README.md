@@ -9,6 +9,7 @@ A bot written in Python using image processing to auto-farm Metin stones. The bo
 - Checks if the player is killed, stuck, or kicked.
 
 ### Notes
+- Rubinum seems to have prevented such scripts from sending input to the client. So currently it seems the bot doesn't work anymore.
 - The bot may not work for every server especially in its current version. It was created for Rubinum. The client must give you the ability to save your login credentials, your player must have a ring that teleports you to the place you want to farm and a map that is made specifically for stone-breaking. The bot isn't advanced enough to run around searching.
 - Configuration for this bot is a bit complex so it may be difficult to understand.
 - Recommended game resolution: 1024x768. 800x600 makes the UI elements overlap each other and causes problems on detection. And larger resolutions will increase the time of image processing.
